@@ -2,10 +2,14 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-TESTS += test/test_litecoin
-bin_PROGRAMS += test/test_litecoin
+#   PM-Tech: tested manually, for automated tests we need to compile a version which delivers uncompressed keystest/base58_tests.cpp  
+#   PM-Tech: Miner tests caried out manually, for future updates collect necessary data!test/miner_tests.cpp 
+
+
+TESTS += test/test_einsteinium
+bin_PROGRAMS += test/test_einsteinium
 TEST_SRCDIR = test
-TEST_BINARY=test/test_litecoin$(EXEEXT)
+TEST_BINARY=test/test_einsteinium$(EXEEXT)
 
 
 EXTRA_DIST += \
@@ -45,8 +49,7 @@ BITCOIN_TESTS =\
   test/amount_tests.cpp \
   test/allocator_tests.cpp \
   test/base32_tests.cpp \
-  test/base58_tests.cpp \
-  test/base64_tests.cpp \
+  test/base64_tests.cpp \ 
   test/bip32_tests.cpp \
   test/bloom_tests.cpp \
   test/bswap_tests.cpp \
@@ -62,7 +65,6 @@ BITCOIN_TESTS =\
   test/main_tests.cpp \
   test/mempool_tests.cpp \
   test/merkle_tests.cpp \
-  test/miner_tests.cpp \
   test/multisig_tests.cpp \
   test/net_tests.cpp \
   test/netbase_tests.cpp \
@@ -105,23 +107,23 @@ BITCOIN_TESTS += \
   wallet/test/rpc_wallet_tests.cpp
 endif
 
-test_test_litecoin_SOURCES = $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
-test_test_litecoin_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/test/ $(TESTDEFS)
-test_test_litecoin_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_CRYPTO) $(LIBUNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
+test_test_einsteinium_SOURCES = $(BITCOIN_TESTS) $(JSON_TEST_FILES) $(RAW_TEST_FILES)
+test_test_einsteinium_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) -I$(builddir)/test/ $(TESTDEFS)
+test_test_einsteinium_LDADD = $(LIBBITCOIN_SERVER) $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) $(LIBBITCOIN_CONSENSUS) $(LIBBITCOIN_CRYPTO) $(LIBUNIVALUE) $(LIBLEVELDB) $(LIBMEMENV) \
   $(BOOST_LIBS) $(BOOST_UNIT_TEST_FRAMEWORK_LIB) $(LIBSECP256K1)
-test_test_litecoin_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+test_test_einsteinium_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 if ENABLE_WALLET
-test_test_litecoin_LDADD += $(LIBBITCOIN_WALLET)
+test_test_einsteinium_LDADD += $(LIBBITCOIN_WALLET)
 endif
 
-test_test_litecoin_LDADD += $(LIBBITCOIN_CONSENSUS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
-test_test_litecoin_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
+test_test_einsteinium_LDADD += $(LIBBITCOIN_CONSENSUS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS)
+test_test_einsteinium_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static
 
 if ENABLE_ZMQ
-test_test_litecoin_LDADD += $(ZMQ_LIBS)
+test_test_einsteinium_LDADD += $(ZMQ_LIBS)
 endif
 
-nodist_test_test_litecoin_SOURCES = $(GENERATED_TEST_FILES)
+nodist_test_test_einsteinium_SOURCES = $(GENERATED_TEST_FILES)
 
 $(BITCOIN_TESTS): $(GENERATED_TEST_FILES)
 

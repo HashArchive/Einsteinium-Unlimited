@@ -12,10 +12,11 @@
 
 BOOST_FIXTURE_TEST_SUITE(main_tests, TestingSetup)
 
+/* PM-Tech: EMC2 Specifications, create our own test
 static void TestBlockSubsidyHalvings(const Consensus::Params& consensusParams)
 {
-    int maxHalvings = 64;
-    CAmount nInitialSubsidy = 50 * COIN;
+    int maxHalvings = 11;
+    CAmount nInitialSubsidy = 1024 * COIN;
 
     CAmount nPreviousSubsidy = nInitialSubsidy * 2; // for height == 0
     BOOST_CHECK_EQUAL(nPreviousSubsidy, nInitialSubsidy * 2);
@@ -42,18 +43,22 @@ BOOST_AUTO_TEST_CASE(block_subsidy_test)
     TestBlockSubsidyHalvings(150); // As in regtest
     TestBlockSubsidyHalvings(1000); // Just another interval
 }
-
+*/
 BOOST_AUTO_TEST_CASE(subsidy_limit_test)
 {
     const Consensus::Params& consensusParams = Params(CBaseChainParams::MAIN).GetConsensus();
     CAmount nSum = 0;
-    for (int nHeight = 0; nHeight < 56000000; nHeight += 1000) {
+    for (int nHeight = 0; nHeight <= 26500000; nHeight += 1) { // For Einsteinium we have to check all, maybe a little more,this takes a while
         CAmount nSubsidy = GetBlockSubsidy(nHeight, consensusParams);
-        BOOST_CHECK(nSubsidy <= 50 * COIN);
-        nSum += nSubsidy * 1000;
+        if (nHeight>1) {
+            BOOST_CHECK(nSubsidy <= 2973 * COIN);
+        } else {
+            BOOST_CHECK(nSubsidy <= 10747 * COIN);
+        }
+        nSum += nSubsidy;
         BOOST_CHECK(MoneyRange(nSum));
     }
-    BOOST_CHECK_EQUAL(nSum, 8399999990760000ULL);
+    BOOST_CHECK_EQUAL(nSum, 29893739300000000ULL);
 }
 
 bool ReturnFalse() { return false; }

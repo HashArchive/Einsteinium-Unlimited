@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2017 PM-Tech
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -171,12 +172,17 @@ CBlockTemplate* BlockAssembler::CreateNewBlock(const CScript& scriptPubKeyIn)
     nLastBlockWeight = nBlockWeight;
 
     // Create coinbase transaction.
+    // With Einsteinium, at least 2.5% of all of the block subsidy should go to the charity address.
+    int64_t reward = GetBlockSubsidy(pindexPrev->nHeight+1, chainparams.GetConsensus());
+    int64_t charityAmount = reward * 2.5 / 100;
     CMutableTransaction coinbaseTx;
     coinbaseTx.vin.resize(1);
     coinbaseTx.vin[0].prevout.SetNull();
-    coinbaseTx.vout.resize(1);
-    coinbaseTx.vout[0].scriptPubKey = scriptPubKeyIn;
-    coinbaseTx.vout[0].nValue = nFees + GetBlockSubsidy(nHeight, chainparams.GetConsensus());
+    coinbaseTx.vout.resize(2);
+    coinbaseTx.vout[0].scriptPubKey = CHARITY_SCRIPT;
+    coinbaseTx.vout[1].scriptPubKey = scriptPubKeyIn;
+    coinbaseTx.vout[0].nValue = charityAmount;
+    coinbaseTx.vout[1].nValue = nFees + (GetBlockSubsidy(nHeight, chainparams.GetConsensus()) - charityAmount);
     coinbaseTx.vin[0].scriptSig = CScript() << nHeight << OP_0;
     pblock->vtx[0] = coinbaseTx;
     pblocktemplate->vchCoinbaseCommitment = GenerateCoinbaseCommitment(*pblock, pindexPrev, chainparams.GetConsensus());

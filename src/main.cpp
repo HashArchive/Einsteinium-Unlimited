@@ -47,11 +47,14 @@
 #include <boost/filesystem/fstream.hpp>
 #include <boost/math/distributions/poisson.hpp>
 #include <boost/thread.hpp>
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/uniform_int.hpp>
+
 
 using namespace std;
 
 #if defined(NDEBUG)
-# error "Litecoin cannot be compiled without assertions."
+# error "Einsteinium cannot be compiled without assertions."
 #endif
 
 /**
@@ -115,8 +118,9 @@ static void CheckBlockIndex(const Consensus::Params& consensusParams);
 
 /** Constant stuff for coinbase transactions we create: */
 CScript COINBASE_FLAGS;
+CScript CHARITY_SCRIPT;
 
-const string strMessageMagic = "Litecoin Signed Message:\n";
+const string strMessageMagic = "Einsteinium Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -1555,7 +1559,7 @@ bool AcceptToMemoryPoolWorker(CTxMemPool& pool, CValidationState& state, const C
         // Remove conflicting transactions from the mempool
         BOOST_FOREACH(const CTxMemPool::txiter it, allConflicting)
         {
-            LogPrint("mempool", "replacing tx %s with %s for %s LTC additional fees, %d delta bytes\n",
+            LogPrint("mempool", "replacing tx %s with %s for %s EMC2 additional fees, %d delta bytes\n",
                     it->GetTx().GetHash().ToString(),
                     hash.ToString(),
                     FormatMoney(nModifiedFees - nConflictingFees),
@@ -1719,17 +1723,67 @@ bool ReadBlockFromDisk(CBlock& block, const CBlockIndex* pindex, const Consensus
     return true;
 }
 
+int static generateMTRandom(unsigned int s, int range)
+{
+    boost::mt19937 gen(s);
+    boost::uniform_int<> dist(1, range);
+    return dist(gen);
+}
+
+// PM-Tech: To ease things up let's use EMC2 specifications for unit tests and Litecoin specifications for regression tests
 CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams)
 {
-    int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return 0;
+    CAmount nSubsidy = 0;
+    if (consensusParams.fPowAllowMinDifficultyBlocks)
+    {
+        int halvings = nHeight / consensusParams.nSubsidyHalvingInterval;
+        // Force block reward to zero when right shift is undefined.
+        if (halvings >= 64)
+            return 0;
 
-    CAmount nSubsidy = 50 * COIN;
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
-    return nSubsidy;
+        nSubsidy = 50 * COIN;
+        // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
+        nSubsidy >>= halvings;
+            return nSubsidy;
+    }
+    else
+    {
+        nSubsidy = 0;
+
+        int StartOffset;
+        int WormholeStartBlock;
+        int mod = nHeight % 36000;
+        if (mod != 0) mod = 1;
+        int epoch = (nHeight / 36000) + mod;
+
+        long wseed = 5299860 * epoch; // Discovered: 1952, Atomic number: 99 Melting Point: 860
+
+        StartOffset = generateMTRandom(wseed, 35820);
+        WormholeStartBlock = StartOffset + ((epoch - 1)  * 36000); // Wormholes start from Epoch 2
+
+        if(epoch > 1 && epoch < 148 && nHeight >= WormholeStartBlock && nHeight < WormholeStartBlock + 180)
+        {
+            nSubsidy = 2973 * COIN;
+        }
+        else
+        {
+        if      (nHeight == 0)        nSubsidy = 50 * COIN; // <-- PM-Tech: add genesis tx here for proper unit tests
+        else if (nHeight == 1)        nSubsidy = 10747 * COIN;
+        else if (nHeight <= 72000)    nSubsidy = 1024 * COIN;
+        else if (nHeight <= 144000)   nSubsidy = 512 * COIN;
+        else if (nHeight <= 288000)   nSubsidy = 256 * COIN;
+        else if (nHeight <= 432000)   nSubsidy = 128 * COIN;
+        else if (nHeight <= 576000)   nSubsidy = 64 * COIN;
+        else if (nHeight <= 864000)   nSubsidy = 32 * COIN;
+        else if (nHeight <= 1080000)  nSubsidy = 16 * COIN;
+        else if (nHeight <= 1584000)  nSubsidy = 8 * COIN;
+        else if (nHeight <= 2304000)  nSubsidy = 4 * COIN;
+        else if (nHeight <= 5256000)  nSubsidy = 2 * COIN;
+        else if (nHeight <= 26280000) nSubsidy = 1 * COIN;
+        else nSubsidy = 0; // <-- PM-Tech: don't leave eternity undefined here
+        }
+    }
+        return nSubsidy;
 }
 
 bool IsInitialBlockDownload()
@@ -2268,7 +2322,7 @@ bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, unsigne
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck() {
-    RenameThread("litecoin-scriptch");
+    RenameThread("einsteinium-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -2522,6 +2576,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                          error("ConnectBlock(): coinbase pays too much (actual=%d vs limit=%d)",
                                block.vtx[0].GetValueOut(), blockReward),
                                REJECT_INVALID, "bad-cb-amount");
+
+    // For Einsteinium also add the protocol rule that the first output in the coinbase must go to the charity address and have at least 2.5% of the subsidy (as per integer arithmetic)
+
+    if (block.vtx[0].vout[0].scriptPubKey != CHARITY_SCRIPT)
+        return state.DoS(100, error("ConnectBlock() : coinbase does not pay to the charity in the first output)"));
+    int64_t charityAmount = GetBlockSubsidy(pindex->nHeight, chainparams.GetConsensus()) * 2.5 / 100;
+    if (block.vtx[0].vout[0].nValue < charityAmount)
+       return state.DoS(100, error("ConnectBlock() : coinbase does not pay enough to the charity"));
+
 
     if (!control.Wait())
         return state.DoS(100, false);
@@ -3602,12 +3665,14 @@ bool ContextualCheckBlock(const CBlock& block, CValidationState& state, CBlockIn
     // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
     // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
     bool checkHeightMismatch = false;
+
+
     if (block.nVersion >= 2)
     {
         if (consensusParams.BIP34Height != -1)
         {
-            // Mainnet 710k
-            if (nHeight >= consensusParams.BIP34Height)
+            // Mainnet - Einsteinium: enforce together with BIP66 because this part was forgotten in the previos code and V1 blocks are being mined, change can be ignored in future
+            if (IsSuperMajority(3, pindexPrev, consensusParams.nMajorityRejectBlockOutdated, consensusParams))
                 checkHeightMismatch = true;
         }
         else
@@ -4376,6 +4441,9 @@ bool InitBlockIndex(const CChainParams& chainparams)
 
     // Initialize global variables that cannot be constructed at startup.
     recentRejects.reset(new CRollingBloomFilter(120000, 0.000001));
+
+    // Initialise the charity script here, as this takes place in the the test code also
+    CHARITY_SCRIPT << OP_DUP << OP_HASH160 << ParseHex(CHARITY_ADDRESS) << OP_EQUALVERIFY << OP_CHECKSIG;
 
     // Check whether we're already initialized
     if (chainActive.Genesis() != NULL)

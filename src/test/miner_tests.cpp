@@ -183,8 +183,8 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
 {
     // Note that by default, these tests run with size accounting enabled.
     const CChainParams& chainparams = Params(CBaseChainParams::MAIN);
-    CScript scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
-    CBlockTemplate *pblocktemplate;
+    CScript scriptPubKey = CScript() << OP_DUP << OP_HASH160 << ParseHex("bad11b71558214c62e2e7ecee27e2ee80ff471ac") << OP_EQUALVERIFY << OP_CHECKSIG;
+    CBlockTemplate *pblocktemplate; //bad11b71558214c62e2e7ecee27e2ee80ff471ac
     CMutableTransaction tx,tx2;
     CScript script;
     uint256 hash;
@@ -205,6 +205,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     std::vector<CTransaction*>txFirst;
     for (unsigned int i = 0; i < sizeof(blockinfo)/sizeof(*blockinfo); ++i)
     {
+        int64_t charityAmount = GetBlockSubsidy(i) * 2.5 / 100;
         CBlock *pblock = &pblocktemplate->block; // pointer for convenience
         pblock->nVersion = 1;
         pblock->nTime = chainActive.Tip()->GetMedianTimePast()+1;
@@ -214,8 +215,10 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
         txCoinbase.vin[0].scriptSig.push_back(blockinfo[i].extranonce);
         txCoinbase.vin[0].scriptSig.push_back(chainActive.Height());
         txCoinbase.vout.resize(1); // Ignore the (optional) segwit commitment added by CreateNewBlock (as the hardcoded nonces don't account for this)
+//        txCoinbase.vout[0].scriptPubKey = CHARITY_SCRIPT;
         txCoinbase.vout[0].scriptPubKey = CScript();
-        pblock->vtx[0] = CTransaction(txCoinbase);
+//        txCoinbase.vout[0].nValue = charityAmount;
+                pblock->vtx[0] = CTransaction(txCoinbase);
         if (txFirst.size() == 0)
             baseheight = chainActive.Height();
         if (txFirst.size() < 4)

@@ -1,42 +1,64 @@
-Litecoin Core integration/staging tree
+Einsteinium Core integration/staging tree
 =====================================
 
-[![Build Status](https://travis-ci.org/litecoin-project/litecoin.svg?branch=master)](https://travis-ci.org/litecoin-project/litecoin)
+[![Build Status](https://travis-ci.org/hashunlimited/einsteinium-unlimited.svg?branch=default)](https://travis-ci.org/hashunlimited/einsteinium-unlimited)
 
-https://litecoin.org
+https://emc2.foundation
 
-What is Litecoin?
+Repo & Branches:
 ----------------
 
-Litecoin is an experimental digital currency that enables instant payments to
-anyone, anywhere in the world. Litecoin uses peer-to-peer technology to operate
+The default branch is always set to the latest release or RC - for the first re-merge to Litecoin it is 0.13.x (coming soon) Releases and RCs are always tagged.
+
+Dev branches are in place for online and offline development - contributors please create your own fork or branch
+
+The "master" branch is used to rebase the latest Litecoun code - otherwise it stays untouched
+
+The current, deprecated Einsteinium 0.9.2 wallet is available as a tagged branch as well
+
+What is Einsteinium?
+----------------
+
+Einsteinium is an experimental digital currency that enables instant payments to
+anyone, anywhere in the world. Einsteinium uses peer-to-peer technology to operate
 with no central authority: managing transactions and issuing money are carried
-out collectively by the network. Litecoin Core is the name of open source
+out collectively by the network. Einsteinium Core is the name of open source
 software which enables the use of this currency.
 
+- Algorithm: Scrypt PoW
+- Total Einsteinium: 299,792,458
+- Initial block value: 1024
+- Reward Reduction Method: Block Halving
+- Block Target Time: 60 seconds
+- Difficulty Re-targeting: per block (Kimoto Gravity Well)
+- RPC Port: 41879
+- P2P Port: 41878
+- Donation to the Einsteinium Charitable Fund (per block): 2%
+- Donation to to faucets, give-aways and marketing (per block): 0.5%
+
 For more information, as well as an immediately useable, binary version of
-the Litecoin Core software, see [https://litecoin.org](https://litecoin.org).
+the Einsteinium Core software, see [https://emc2.foundation](https://emc2.foundation).
 
 License
 -------
 
-Litecoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
+Einsteinium Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see https://opensource.org/licenses/MIT.
 
 Development Process
 -------------------
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/litecoin-project/litecoin/tags) are created
-regularly to indicate new official, stable release versions of Litecoin Core.
+completely stable. [Tags](https://github.com/HashUnlimited/Einsteinium-Unlimited/tags) //ToDo: change after first release //are created
+regularly to indicate new official, stable release versions of Einsteinium Core.
 
 The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The developer [mailing list](https://groups.google.com/forum/#!forum/litecoin-dev)
+The developer [mailing list](https://add mailing list link)
 should be used to discuss complicated or controversial changes before working
 on a patch set.
 
-Developer IRC can be found on Freenode at #litecoin-dev.
+Developers can easily be reached on our [Slack](http://emc2slack.herokuapp.com/).
 
 Testing
 -------
@@ -69,7 +91,7 @@ Translations
 ------------
 
 We only accept translation fixes that are submitted through [Bitcoin Core's Transifex page](https://www.transifex.com/projects/p/bitcoin/).
-Translations are converted to Litecoin periodically.
+Translations are converted to Einsteinium periodically.
 
 Translations are periodically pulled from Transifex and merged into the git repository. See the
 [translation process](doc/translation_process.md) for details on how this works.

@@ -86,8 +86,8 @@
         <translation>Změnit heslo k šifrování peněženky</translation>
     </message>
     <message>
-        <source>Litecoin</source>
-        <translation>Litecoin</translation>
+        <source>Einsteinium</source>
+        <translation>Einsteinium</translation>
     </message>
     <message>
         <source>&amp;File</source>

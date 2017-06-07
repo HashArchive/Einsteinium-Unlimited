@@ -1,5 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2017 PM-Tech
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -189,7 +190,7 @@ UniValue generatetoaddress(const UniValue& params, bool fHelp)
             "\nMine blocks immediately to a specified address (before the RPC call returns)\n"
             "\nArguments:\n"
             "1. numblocks    (numeric, required) How many blocks are generated immediately.\n"
-            "2. address    (string, required) The address to send the newly generated litecoin to.\n"
+            "2. address    (string, required) The address to send the newly generated einsteinium to.\n"
             "3. maxtries     (numeric, optional) How many iterations to try (default = 1000000).\n"
             "\nResult\n"
             "[ blockhashes ]     (array) hashes of blocks generated\n"
@@ -464,10 +465,10 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid mode");
 
     if (vNodes.empty())
-        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Litecoin is not connected!");
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Einsteinium is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Litecoin is downloading blocks...");
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Einsteinium is downloading blocks...");
 
     static unsigned int nTransactionsUpdatedLast;
 
@@ -666,7 +667,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
     result.push_back(Pair("transactions", transactions));
     result.push_back(Pair("coinbaseaux", aux));
-    result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue));
+    result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue + (int64_t)pblock->vtx[0].vout[1].nValue)); //<--Einsteinium: Specifications
+    result.push_back(Pair("charityvalue", (int64_t)pblock->vtx[0].vout[0].nValue)); //<--Einsteinium: Specifications
     result.push_back(Pair("longpollid", chainActive.Tip()->GetBlockHash().GetHex() + i64tostr(nTransactionsUpdatedLast)));
     result.push_back(Pair("target", hashTarget.GetHex()));
     result.push_back(Pair("mintime", (int64_t)pindexPrev->GetMedianTimePast()+1));
@@ -852,7 +854,7 @@ UniValue estimatesmartfee(const UniValue& params, bool fHelp)
             "1. nblocks     (numeric)\n"
             "\nResult:\n"
             "{\n"
-            "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in LTC)\n"
+            "  \"feerate\" : x.x,     (numeric) estimate fee-per-kilobyte (in EMC2)\n"
             "  \"blocks\" : n         (numeric) block number where estimate was found\n"
             "}\n"
             "\n"
